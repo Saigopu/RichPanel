@@ -1,4 +1,5 @@
 import express from "express";
+import { getConversationsList, getMessagesList,sendMessage } from "./controllers/getconvlist.js";
 
 const router = express.Router();
 
@@ -18,6 +19,11 @@ router.get('/webhook', (req, res) => {
     }
 });
 
+router.get('/conversationsList', getConversationsList);
+router.get('/messagesList', getMessagesList);
+router.get('/sendmessage', sendMessage);
+
+//leaving jwts for now
 
 
 

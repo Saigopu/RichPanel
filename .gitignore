@@ -42,6 +42,7 @@ backend/build
 
 #backend env file
 backend/.env
+frontend/.env
 
 # misc
 frontend/.DS_Store

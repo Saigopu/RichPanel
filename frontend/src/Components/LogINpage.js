@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function LogINpage() {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-blue-500 flex justify-center items-center h-screen">
       <div className="bg-white p-8 rounded-lg shadow-lg">
@@ -42,6 +45,9 @@ export default function LogINpage() {
           <button
             type="submit"
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            onClick={() => {
+              navigate("/fblogin");
+            }}
           >
             Login
           </button>

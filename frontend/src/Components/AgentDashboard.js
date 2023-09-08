@@ -1,3 +1,7 @@
+import React from "react";
+import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import "./AgentDashboard.css";
 import Logo from "../assets/logo.png";
 import User from "../assets/user.png";
@@ -11,10 +15,87 @@ import Profile1 from "../assets/profile1.png";
 import Messages from "./Messages";
 
 const AgentDashboard = () => {
- 
+  const location = useLocation();
+  console.log(location.state);
+  const userAccessToken = location.state;
+
+  const [conversationList, setConversationList] = useState(null);
+  const [conversation, setConversation] = useState(null);
+  const [conversationID, setConversationID] = useState(null);
+
+  useEffect(() => {
+    const getConversations = async () => {
+      // const config = {
+      //   headers: {
+      //     Authorization: `Bearer ${userAccessToken}`,
+      //   },
+      // };
+      // const { data } = await axios.get(
+      //   `https://graph.facebook.com/v11.0/me/conversations?fields=messages{message,from,to,created_time},participants&access_token=${userAccessToken}`,
+      //   config
+      // );
+      //how to pass the useraccesstoken as the parameter in the below get request
+      // const { data } = await axios.get(
+      //   `http://localhost:8000/api/conversationsList?${userAccessToken}`
+      // );
+
+      await axios
+        .get(`http://localhost:8000/api/conversationsList`, {
+          params: {
+            userAccessToken: userAccessToken,
+            // email: sessionStorage.getItem("email"),
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          console.log(response.data);
+          setConversationList(response.data.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      // await axios
+      //   .get(`http://localhost:8000/api/conversationsList?${userAccessToken}`)
+      //   .then((response) => {
+      //     console.log(response);
+      //     console.log(response.data);
+      //     setConversationList(response.data.data);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+    };
+    getConversations();
+  }, []);
+
+  async function handleEnterKeyPress() {
+    console.log("enter key pressed");
+
+      await axios
+        .get(`http://localhost:8000/api/sendmessage`, {
+          params: {
+            userAccessToken: userAccessToken,
+            userID: conversationList.data[0].data[0].id,
+            // email: sessionStorage.getItem("email"),
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          // console.log(response.data);
+          // setConversationList(response.data.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+  }
+
+  if (!conversationList) return <div>Loading...</div>;
+
   return (
-    <div
-      className="grid-container w-[100%] h-screen">
+    <div className="grid-container w-[100%] h-screen">
       <div className="item1 ">
         <div className="flex flex-col space-y-[380px] items-center">
           {/* section 1 sidebar */}
@@ -36,43 +117,29 @@ const AgentDashboard = () => {
           <img className="w-8 m-2" src={Reload} alt="R" />
         </div>
         {/* conversation sidebar */}
-        <div>
-          <div className="p-2 hover:bg-[#edeef0]">
-            <div className="flex justify-between">
-              <div className="flex">
-                <input className="mx-2" type="checkbox" />
-                <div className="flex flex-col">
-                  <h1 className="font-bold">Amit RJ</h1>
-                  <p className="text-sm text-gray-500/50">Facebook DM</p>
-                </div>
-              </div>
-              <span className="mx-2">10m</span>
-            </div>
 
-            <p className="text-md mx-2">Awesome product</p>
-            <p className="text-gray-500/50 text-sm mx-2">
-              Lorem ipsum dolor sit,{" "}
-            </p>
-          </div>
-        </div>
         <div>
-          <div className="p-2 hover:bg-[#edeef0] border-2 border-x-[#ededed]">
-            <div className="flex justify-between">
-              <div className="flex">
-                <input className="mx-2" type="checkbox" />
-                <div className="flex flex-col">
-                  <h1 className="font-bold">Hiten Saxena</h1>
-                  <p className="text-sm text-gray-500/50">Facebook Post</p>
+          {conversationList.data.map((conversation) => (
+            <div
+              className="p-2 hover:bg-[#edeef0]"
+              onClick={() => {setConversationID(conversation.id);
+              setConversation(conversation)}}
+            >
+              <div className="flex justify-between">
+                <div className="flex">
+                  <input className="mx-2" type="checkbox" />
+                  <div className="flex flex-col">
+                    <h1 className="font-bold">
+                      {conversation.participants.data[0].name}
+                    </h1>
+                    <p className="text-sm text-gray-500/50">Facebook DM</p>
+                  </div>
                 </div>
+                {/* <span className="mx-2">10m</span> */}
+                {/*code to show recently received messege time */}
               </div>
-              <span className="mx-2">10m</span>
             </div>
-
-            <p className="text-md mx-2">Available in store?</p>
-            <p className="text-gray-500/50 text-sm mx-2">
-              Lorem ipsum dolor sit,{" "}
-            </p>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -81,15 +148,12 @@ const AgentDashboard = () => {
         {/* heading */}
         <h1 className="text-xl font-bold bg-white px-4 py-2">Amit RG</h1>
         {/* chat feature */}
-        <Messages/>
-        <div className="flex justify-center items-center">
-          {/* useState for the chat exchange */}
-          <input
-            type="text"
-            className="absolute bottom-4 left-[30.5%] right-[23%] p-2 mx-2 bg-white rounded-md outline outline-blue-600"
-            placeholder="Message Hilten Saxena"
-          />
-        </div>
+        <Messages
+          conversationId={conversationID}
+          userAccessToken={userAccessToken}
+          conversation={conversation}
+        />
+        
       </div>
       {/* profile section */}
       <div className="item4 bg-[#eff2f7]">

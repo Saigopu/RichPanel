@@ -7,21 +7,29 @@ const port = 8000;
 
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
-
+app.use(express.json());
 app.use("/api", router);
 
+// Handle the GET request for verification
 app.get("/webhook", (req, res) => {
   const challenge = req.query["hub.challenge"];
-  console.log(req.query)
-  console.log(challenge);
-  //if block
-  console.log(typeof(challenge));
-  res.set('Content-Type', 'text/plain');
+  res.set("Content-Type", "text/plain");
   res.status(200).send(challenge);
+});
+
+// Handle incoming POST requests from Facebook's webhook
+app.post("/webhook", (req, res) => {
+  const body = req.body;
+  console.log("Received update from Facebook:", body);
+
+  // Process the update (handle messages, events, etc.)
+
+  // Send a response to acknowledge receipt of the update
+  res.status(200).send("Update received");
 });
 
 app.listen(port, () => {

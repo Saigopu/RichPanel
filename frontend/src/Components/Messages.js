@@ -7,6 +7,7 @@ const Messages = (props) => {
   // const messages_data = data.messages.data;
   const [messages, setMesseges] = useState(null);
   const [usermessage, setUsermessage] = useState(null);
+  const [lastmid, setLastmid] = useState(null);
   console.log(props.conversation);
   function formatDate(inputDate) {
     const options = {
@@ -48,20 +49,65 @@ const Messages = (props) => {
     getConversations();
   }, [props.conversationId]);
 
-  const reloadIntervalId = setInterval(async () => {
-    await axios
-      .get(`http://localhost:8000/updatedMSG`, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        console.log(response);
-        // console.log(response.data.data.messages.data);
-        // setMesseges(response.data.data.messages.data.reverse());
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, 1000);
+  if (messages) {
+    const reloadIntervalId = setInterval(async () => {
+      await axios
+        .get(`http://localhost:8000/updatedMSG`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          // console.log(response.data.data.messages.data);
+          // setMesseges(response.data.data.messages.data.reverse());
+
+          let oldformat = messages[0];
+          let newformat;
+          
+          if ( lastmid!==response.data.message.mid ) {
+            console.log(lastmid, response.data.message.mid)
+            //append the latest message to the messages in the same formal by using the spread operator
+            // setMesseges([...messages,response.data.data.messages.data[0]]);
+            //function to get the current time in yyyy-mm-dd hh:mm:ss format
+            //
+            function getCurrentDateTime() {
+              const now = new Date();
+              const year = now.getFullYear();
+              const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+              const day = String(now.getDate()).padStart(2, "0");
+              const hours = String(now.getHours()).padStart(2, "0");
+              const minutes = String(now.getMinutes()).padStart(2, "0");
+              const seconds = String(now.getSeconds()).padStart(2, "0");
+
+              const formattedDateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+              return formattedDateTime;
+            }
+
+            // Usage:
+            const currentDateTime = getCurrentDateTime();
+            // console.log(currentDateTime);
+
+            console.log("new message");
+            newformat = {
+              ...oldformat,
+              from: {
+                id: response.data.sender.id,
+              },
+              to: {
+                id: response.data.recipient.id,
+              },
+              message: response.data.message.text,
+              created_time: currentDateTime,
+              id: response.data.message.mid,
+            };
+            setMesseges(messages.concat(newformat));
+            setLastmid(response.data.message.mid);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, 5000);
+  }
 
   async function handleEnterKeyPress() {
     console.log("enter key pressed");
@@ -84,6 +130,24 @@ const Messages = (props) => {
       .catch((error) => {
         console.log(error);
       });
+
+      await axios
+        .get(`http://localhost:8000/api/messagesList`, {
+          params: {
+            userAccessToken: props.userAccessToken,
+            conversationId: props.conversationId,
+            // email: sessionStorage.getItem("email"),
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          console.log(response);
+          console.log(response.data.data.messages.data);
+          setMesseges(response.data.data.messages.data.reverse());
+        })
+        .catch((error) => {
+          console.log(error);
+        });
   }
 
   if (!messages) return <div>Loading...</div>;
@@ -92,7 +156,7 @@ const Messages = (props) => {
     <div className="flex flex-col h-screen">
       <div className="overflow-y-auto h-5/6">
         {messages.map((chat, i) => {
-          return chat.from.name !== "Helpdesk" ? (
+          return chat.from.id !== "132758756577463" ? (
             <div className="flex flex-col">
               <div className="flex">
                 <img className="w-10 my-2" src={Profile} alt="" />

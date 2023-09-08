@@ -41,7 +41,7 @@ const AgentDashboard = () => {
       // );
 
       await axios
-        .get(`http://localhost:8000/api/conversationsList`, {
+        .get(`https://rpassignment.onrender.com/api/conversationsList`, {
           params: {
             userAccessToken: userAccessToken,
             // email: sessionStorage.getItem("email"),
@@ -75,7 +75,7 @@ const AgentDashboard = () => {
     console.log("enter key pressed");
 
       await axios
-        .get(`http://localhost:8000/api/sendmessage`, {
+        .get(`https://rpassignment.onrender.com/api/sendmessage`, {
           params: {
             userAccessToken: userAccessToken,
             userID: conversationList.data[0].data[0].id,

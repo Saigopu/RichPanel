@@ -14,9 +14,10 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/login" element={<Login />} /> */}
         <Route path="/fblogin" element={<FBLoginpage />} />
         <Route path="/agentdashboard" element={<AgentDashboard />} />
+        <Route path="*" element={<Login />} />
         {/* the below route is dynamic routing */}
         {/* <Route path="/problems/:problemID" render={(props) => <ProblemDetails {...props} onLogout={handleLogout}/>} /> */}
         {/* followed this blog https://blog.webdevsimplified.com/2022-07/react-router/ to solve the issue with the above dynamic route */}

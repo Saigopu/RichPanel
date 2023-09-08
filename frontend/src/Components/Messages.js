@@ -29,7 +29,7 @@ const Messages = (props) => {
     // setMesseges(messages);
     const getConversations = async () => {
       await axios
-        .get(`http://localhost:8000/api/messagesList`, {
+        .get(`https://rpassignment.onrender.com/api/messagesList`, {
           params: {
             userAccessToken: props.userAccessToken,
             conversationId: props.conversationId,
@@ -52,7 +52,7 @@ const Messages = (props) => {
   if (messages) {
     const reloadIntervalId = setInterval(async () => {
       await axios
-        .get(`http://localhost:8000/updatedMSG`, {
+        .get(`https://rpassignment.onrender.com/updatedMSG`, {
           withCredentials: true,
         })
         .then((response) => {
@@ -106,13 +106,13 @@ const Messages = (props) => {
         .catch((error) => {
           console.log(error);
         });
-    }, 5000);
+    }, 10000);
   }
 
   async function handleEnterKeyPress() {
     console.log("enter key pressed");
     await axios
-      .get(`http://localhost:8000/api/sendmessage`, {
+      .get(`https://rpassignment.onrender.com/api/sendmessage`, {
         params: {
           userAccessToken: props.userAccessToken,
           userID: props.conversation.participants.data[0].id,
@@ -132,7 +132,7 @@ const Messages = (props) => {
       });
 
       await axios
-        .get(`http://localhost:8000/api/messagesList`, {
+        .get(`https://rpassignment.onrender.com/api/messagesList`, {
           params: {
             userAccessToken: props.userAccessToken,
             conversationId: props.conversationId,

@@ -20,6 +20,7 @@ function SignUp() {
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
+        navigate("/login");
       })
       .catch((err) => {
         console.log(err);
@@ -33,7 +34,7 @@ function SignUp() {
         Email: email,
         RememberMe: rememberMe,
       });
-      navigate("/login");
+      
     } catch (error) {
       console.error(error);
     }
@@ -89,7 +90,7 @@ function SignUp() {
             className="text-white rounded-md w-full p-2 text-xl bg-[#1e4d91]"
             type="submit"
           >
-            <a href="/login">Sign Up</a>
+            Sign Up
           </button>
         </form>
         <div className="mt-2 text-center">

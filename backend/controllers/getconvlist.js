@@ -1,5 +1,7 @@
 import axios from "axios";
 
+
+
 export const getConversationsList = async (req, res) => {
   console.log("called controller");
   const userAccessToken = req.query.userAccessToken;
@@ -79,6 +81,7 @@ export const sendMessage = async (req, res) => {
   console.log("called controller");
   const userAccessToken = req.query.userAccessToken;
   const userID = req.query.userID;
+  const message = req.query.message;
   console.log(userAccessToken);
   let pageID = "";
   let pageAccessToken;
@@ -117,13 +120,19 @@ export const sendMessage = async (req, res) => {
           id: userID,
         },
         message: {
-          text: " the web app!",
+          text: message,
         },
       }
     );
-    console.log(response, "printing the response in the sendmessage controller");
+    console.log(
+      response,
+      "printing the response in the sendmessage controller"
+    );
     res.status(200).json({ data: "success" });
   } catch (error) {
     console.log(error);
   }
 };
+
+
+

@@ -5,12 +5,16 @@ import SignUPpage from "./Components/SignUPpage";
 import LogINpage from "./Components/LogINpage";
 import FBLoginpage from "./Components/FBLoginpage";
 import AgentDashboard from "./Components/AgentDashboard";
+import SignUp from "./Components/signUp";
+import Login from "./Components/Login";
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LogINpage />} />
+        <Route path="/" element={<SignUp />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/fblogin" element={<FBLoginpage />} />
         <Route path="/agentdashboard" element={<AgentDashboard />} />
         {/* the below route is dynamic routing */}

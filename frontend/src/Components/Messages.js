@@ -6,6 +6,7 @@ import Profile from "../assets/profile.png";
 const Messages = (props) => {
   // const messages_data = data.messages.data;
   const [messages, setMesseges] = useState(null);
+  const [usermessage, setUsermessage] = useState(null);
   console.log(props.conversation);
   function formatDate(inputDate) {
     const options = {
@@ -26,20 +27,6 @@ const Messages = (props) => {
     //get The data from the server and store it in the messages state
     // setMesseges(messages);
     const getConversations = async () => {
-      // const config = {
-      //   headers: {
-      //     Authorization: `Bearer ${userAccessToken}`,
-      //   },
-      // };
-      // const { data } = await axios.get(
-      //   `https://graph.facebook.com/v11.0/me/conversations?fields=messages{message,from,to,created_time},participants&access_token=${userAccessToken}`,
-      //   config
-      // );
-      //how to pass the useraccesstoken as the parameter in the below get request
-      // const { data } = await axios.get(
-      //   `http://localhost:8000/api/conversationsList?${userAccessToken}`
-      // );
-
       await axios
         .get(`http://localhost:8000/api/messagesList`, {
           params: {
@@ -57,20 +44,24 @@ const Messages = (props) => {
         .catch((error) => {
           console.log(error);
         });
-
-      // await axios
-      //   .get(`http://localhost:8000/api/conversationsList?${userAccessToken}`)
-      //   .then((response) => {
-      //     console.log(response);
-      //     console.log(response.data);
-      //     setConversationList(response.data.data);
-      //   })
-      //   .catch((error) => {
-      //     console.log(error);
-      //   });
     };
     getConversations();
   }, [props.conversationId]);
+
+  const reloadIntervalId = setInterval(async () => {
+    await axios
+      .get(`http://localhost:8000/updatedMSG`, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        console.log(response);
+        // console.log(response.data.data.messages.data);
+        // setMesseges(response.data.data.messages.data.reverse());
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, 1000);
 
   async function handleEnterKeyPress() {
     console.log("enter key pressed");
@@ -79,12 +70,14 @@ const Messages = (props) => {
         params: {
           userAccessToken: props.userAccessToken,
           userID: props.conversation.participants.data[0].id,
+          message: usermessage,
           // email: sessionStorage.getItem("email"),
         },
         withCredentials: true,
       })
       .then((response) => {
         console.log(response);
+        setUsermessage("");
         // console.log(response.data);
         // setConversationList(response.data.data);
       })
@@ -96,8 +89,8 @@ const Messages = (props) => {
   if (!messages) return <div>Loading...</div>;
 
   return (
-    <>
-      <div className="overflow-y-auto">
+    <div className="flex flex-col h-screen">
+      <div className="overflow-y-auto h-5/6">
         {messages.map((chat, i) => {
           return chat.from.name !== "Helpdesk" ? (
             <div className="flex flex-col">
@@ -128,12 +121,14 @@ const Messages = (props) => {
           );
         })}
       </div>
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center ">
         {/* useState for the chat exchange */}
         <input
           type="text"
-          className="absolute bottom-4 left-[30.5%] right-[23%] p-2 mx-2 bg-white rounded-md outline outline-blue-600"
+          className=" p-2 mx-2 bg-white rounded-md outline outline-blue-600"
           placeholder="Message Hilten Saxena"
+          value={usermessage}
+          onChange={(e) => setUsermessage(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               // Call your function here
@@ -142,7 +137,7 @@ const Messages = (props) => {
           }}
         />
       </div>
-    </>
+    </div>
   );
 };
 
